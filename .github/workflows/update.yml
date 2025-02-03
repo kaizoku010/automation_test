@@ -8,10 +8,14 @@ on:
 jobs:
   update-repo:
     runs-on: ubuntu-latest
+    permissions: # Add permissions for the GITHUB_TOKEN
+      contents: write
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        ref: main # Check out the main branch explicitly
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
@@ -21,11 +25,10 @@ jobs:
     - name: Run update script
       run: node updateRepo.js
 
-    - name: Push changes
+    - name: Commit and Push changes
       run: |
         git config --global user.name "GitHub Actions Bot"
         git config --global user.email "github-actions-bot@users.noreply.github.com"
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         git add .
         git commit -m "Auto-update: $(date)"
-        git push
+        git push origin main # Push to the main branch explicitly
